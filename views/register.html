@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>登陆 - To-Do</title>
+    <!-- <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="../node_modules/bootstrap/dist/css/bootstrap.css" />
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="../public/stylesheets/todo.css" /> -->
+    <script src="javascripts/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="/stylesheets/bootstrap.min.css" />
+    <script src="javascripts/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="/stylesheets/todo.css" />
+</head>
+<body class="login-my">
+    <div id="root">
+        <div class>
+            <div class="container">
+                <div class="login-title">
+                   <h1>To-Do 用户注册</h1>
+                </div>
+                <hr style="border: 1px white solid">
+                <div class="login">
+                    <div class="login-box">
+                        <form role="form" action="/register_post" method="POST">
+                            <fieldset>
+                                <div class="form-group">
+                                    <label for=""></label>
+                                    <input type="text" class="form-control" id="username" name="username"placeholder="邮箱/用户名/已验证手机">
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control" id="password1" name ="password1"placeholder="请输入密码">
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control" id="password2" name = "password2" placeholder="请再次输入密码">
+                                </div>
+                                <div class="form-group">
+                                    <button onclick="reg()" class="btn btn-primary">注&nbsp;册</button> 
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+               </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

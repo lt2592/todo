@@ -1,0 +1,209 @@
+.index{
+    background-image: url("/images/bg1.jpg");
+    width: 100%;
+}
+.index a{
+    color: black;
+    text-decoration : none
+}
+.index li{
+    list-style: none;
+}
+/* 编辑区域 */
+
+.edit_area{
+    width:70%;
+    height:600px;
+    float: left;  
+}
+.mydate{
+    height:100px;
+    background-color: rgba(255, 255, 255, 0.8)
+}
+.mydate span{
+    margin-left: 20px;
+}
+.mydate .button_my{
+    margin-top: 5px;
+    margin-left: 10px;
+    float: left;
+}
+.mydate button{
+    background-color: rgba(165, 157, 157, 0.5);
+    width: 155px;
+}
+.mydate .title{
+    font-size: 40px;
+}
+.mydate .time{
+    font-size: 20px;
+    float: right;
+    margin-right: 20px;
+}
+.mydate input{
+    width: 100%;
+    height: 40px;
+}
+.textarea{
+    height: 500px;
+    width: 100%;
+    overflow-y:auto; 
+    overflow-x:auto; 
+    background-color: rgba(255, 255, 255, 0.5);
+    color: black
+}
+.textarea li{
+    background-color: rgba(255,255,255,0.5)
+}
+.textarea input{
+    width: 60%;
+    margin-top: -30px;
+    margin-left: 30px;
+}
+.textarea .icon{
+    width: 25px;
+    margin-right: 20px;
+    margin-left:0px;
+}
+.textarea .smallicon{
+    width: 15px;
+}
+.textarea .smallListName{
+    font-size: 15px;
+    float: right;
+}
+.textarea button{
+    width: 150px;
+}
+
+
+/* 登陆区域 */
+.login_area{
+    width: 30%;
+    height:100px;
+    float: left;
+    /* border-bottom: 1px rgba(190, 80, 218, 0.5) solid; */
+    background-color:rgba(255, 255, 255, 0.8)
+}
+.login_area .head{
+    width: 50px;
+    margin: 5px
+}
+.login_area a{
+    margin-left: 20px;
+    line-height: 100%;
+}
+.login_area .search{
+    width: 25px;
+    margin-top:-30px;
+    margin-right: 20px;
+    float: right;
+}
+.login_area input{
+    width: 100%;
+}
+/* 清单区域 */
+.list_area{
+    width: 30%;
+    height: 500px;
+    float: left;
+    padding: 20px;
+    overflow-y:auto; 
+    overflow-x:auto;
+    /* border-bottom: 1px rgb(233, 39, 39,0.5) solid; */
+    background-color:rgba(255, 255, 255, 0.8)
+}
+.list_area span{
+    margin-left: 20px;
+}
+.list_area .nav-link .active{
+    background-color: aqua
+}
+.list_area li{
+    background-color: rgba(255,255,255,0.5)
+}
+.list_area a .icon{
+    width: 25px;
+}
+/* 隐藏区域 */
+.hidden{
+    width:400px;
+    height: 250px;
+    position: absolute;;
+    background-color:rgba(0, 255, 106, 0.5);
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    border-radius: 5px;
+    background-image: url("/images/hidden.png")
+}
+.hidden h3{
+    color: rgb(255, 255, 255);
+    text-align: center;
+}
+.hidden input{
+    width: 80%;
+    margin-left:auto;
+    margin-right: auto;
+    margin-top: 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+} 
+.hidden .button_my{
+    margin-left: 40px;
+    float: right;
+}
+.hidden .button_my button{
+    margin-left: 20px;
+}
+.hidden button{
+    margin-top: 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 155px;
+}
+
+
+
+
+.login-my{
+    background-image: url("../images/bg8.jpg");
+    background-repeat:no-repeat;
+}
+.login-title{
+    text-align: center;
+    height: 100px;
+    padding: 20px;
+    color:rgb(255, 249, 249);
+
+}
+.login{
+    width: 450px;
+    height: 300px;
+    background-color: rgba(211, 202, 202,0.5);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    border-radius: 5px;
+}
+.login .login-box{
+    margin-top: 20px;
+}
+.login .form-group{
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.login .login-links a{
+    float: right;
+    margin-right: 30px;
+    color: white;
+}
+.login button{
+    width: 100%;
+    background-color: rgb(66, 66, 150)
+}
+

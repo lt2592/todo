@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>[v-cloak]{
+    display: none !important;
+}</style>
+<head>
+    <meta charset="utf-8" />
+    <title>我的一天 - To-Do</title>
+    <script src="javascripts/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="/stylesheets/bootstrap.min.css" />
+    <script src="javascripts/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="/stylesheets/todo.css" />   
+</head>
+<body class="index" id="index" onload="vm.auto()">
+    <div id="app" v-cloak>           
+        <div id="root">
+                <div class>
+                    <div class="container">
+                        <!-- 待办事项区域 -->
+                        <div class="edit_area">
+                            <div class="mydate">
+                                <div v-if="isCreat===true">
+                                    <input class="input-group-text" type="text" id="newList" placeholder="无标题清单">
+                                    <div class="button_my">
+                                        <button @click="sub_list()" class="btn" >创建</button>
+                                        <button @click="createList()" class="btn">取消</button>
+                                    </div> 
+                                </div>
+                                <div v-else-if="isSearch===true">
+                                    <span id="listName"class="title">正在搜索“{{searchContent}}”</span>
+                                    (再次点击搜索框退出搜索)
+                                </div>
+                                <div v-else>
+                                    <span id="listName"class="title">{{lists[kindOfList].listName}}</span>
+                                </div>
+                                <span class="time">{{curDate}}</span>
+                            </div>
+                            <div class="textarea">
+                                <ul class="list-group" >
+                                    <div v-if="isSearch">
+                                        <div id="scheMenu">
+                                            <ul class="list-group" >
+                                                <li class="list-group-item list-group-item-action" v-for="list in resultLists">
+                                                    <img src="/images/schedule.png" class="icon" />{{list.sch}}
+                                                    <span class="smallListName">
+                                                        <a href="#" v-if="list.kindOfList==0"><img src="/images/day.png" class="smallicon" />{{list.listName}}</a>
+                                                        <a href="#" v-if="list.kindOfList==1"><img src="/images/todo1.png" class="smallicon" />{{list.listName}}</a>
+                                                        <a href="#" v-if="list.kindOfList>2"><img src="/images/lists.png" class="smallicon"/>{{list.listName}}</a>
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div v-else-if="isSort">
+                                        <div id="scheMenu">
+                                            <ul class="list-group" >
+                                                <li class="list-group-item list-group-item-action" v-for="schedule in orderSche">
+                                                    <img src="/images/schedule.png" class="icon" />{{schedule.sch}}
+                                                    <span style="float:right;">{{schedule.priority}}</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div v-else>
+                                        <div id="scheMenu">
+                                            <div v-for="obj in lists[kindOfList].schedule" v-if="obj.flag == false || isDisplay == true" >
+                                                <li class="list-group-item  list-group-item-action">
+                                                    <a href="#">
+                                                        <img v-if="obj.flag == false" src="/images/schedule.png" class="icon" />
+                                                        <img v-else src="/images/solved3.png" class="icon">
+                                                        {{obj.sch}}
+                                                        <span style="float:right;"v-if="isDisplayPriority">{{obj.priority}}</span>
+                                                    </a>
+                                                </li>
+                                            </div>
+                                        </div>
+                                        <div v-if="!isAddSchedule">
+                                            <li class="list-group-item" @click="add_schedule">
+                                                <a href="#"><img src="/images/add_schedule.png" class="icon"/>添加代办事项</a>
+                                            </li>
+                                        </div>
+                                        <div v-else>
+                                            <li class="list-group-item">                                               
+                                                <img src="/images/schedule.png" class="icon"/>
+                                                <input class="input-group-text" type="text" v-model="createSchName" placeholder="添加待办事项"style="width: 100%;">
+                                            </li>
+                                            <button class="btn" @click="sub_schedule()">添加</button>
+                                            <button class="btn" @click="add_schedule()">取消</button>
+                                        </div>          
+                                    </div>
+                                </ul>    
+                            </div>
+                        </div>
+                        <!-- 登陆区域 -->
+                        <div class="login_area">
+                            <img src="/images/head.png" class="head" alt="">
+                            <a href="#" id="username"><%= username %></a>
+                            <input type="text" class="input-group-text" v-model ="searchContent"onclick = "vm.changeSearchFlag()"id="searchContent" placeholder="输入搜索内容...">
+                            <img src="/images/search.png" class="search" alt="">
+                        </div>
+                        <!-- 清单区域 -->
+                        <div class="list_area">
+                            <ul class="list-group" id="listMenu">
+                                <li class="list-group-item  list-group-item-action" @click="changeList(0)">
+                                    <a href="#"><img src="/images/day.png" class="icon" /><span>我的一天</span></a>
+                                </li>
+                                <li class="list-group-item  list-group-item-action" @click="changeList(1)">
+                                    <a href="#"><img src="/images/todo1.png" class="icon" /><span>To-Do</span></a>
+                                </li>
+                                <li class="list-group-item  list-group-item-action" @click="changeList(2)">
+                                    <a href="#"><img src="/images/solved2.png" class="icon"/><span>已解决</span></a>
+                                </li>
+                                <li class="list-group-item  list-group-item-action" v-for="list,index in lists"v-if="index>=3" @click="changeList(index)">
+                                    <a href="#"><img src="/images/lists.png" class="icon"/><span>{{list.listName}}</span></a>
+                                </li>
+                            </ul>
+                            <ul class="list-group">
+                                <li class="list-group-item  list-group-item-action"  @click="createList()">
+                                    <a href="#"><img src="/images/add_list.png" class="icon"/><span>添加清单</span></a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- 隐藏区域 -->
+                        <div  id="deadline" class = "hidden"style="display:none;">
+                            <h3>编辑待办事项</h3>
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="schName" v-model="isReviseSchName"style="margin-top:10px;">
+                            </div>
+                            <div class="form-group">
+                                <input type="date" class="form-control" id= "date">
+                            </div>
+                            <div class="button_my">
+                                <button @click="reviseSch()" class="btn">更改</button>
+                                <button @click="cancel()" class="btn">取消</button>
+                                
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+        
+    <script src="javascripts/vue.js "></script>
+    <script src="javascripts/jquery.contextify.js"></script>
+    <!-- vue -->
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data:{
+                lists:[{
+                    listName:'',
+                    schedule:[]
+                }],
+                orderSche:[],
+                kindOfList:0,
+                rightRightKindOfSch:0,
+                rightRightKindOfList:0,
+                isCreat:false,
+                isAddSchedule:false,
+                isDisplay:true,
+                isSearch:false,
+                isSort:false,
+                isDisplayPriority:false,
+                isAddDeadline:false,
+                isReviseSchName:'',
+                kindOfSyle:0,
+                searchContent:"",
+                username:'',
+                curDate:'',
+                createSchName:''
+            },
+            methods:{
+                //显示当前日期
+                startTime:function(){   
+                    var today=new Date();   
+                    var year = today.getFullYear();   
+                    var month = today.getMonth()+1;   
+                    var day = today.getDate();     
+                    this.curDate = year+"年"+month +"月"+ day +"日 "   
+                },
+                //修改代表当前清单的flag
+                changeList:function(kindOfList){
+                    this.kindOfList = kindOfList
+                    var data = {
+                        kindOfList:this.kindOfList
+                    }
+                },
+                //修改代表是否正在创建清单的flag
+                createList:function(){
+                    this.isCreat = !this.isCreat
+                },
+                //修改代表是否正在添加待办事项的flag
+                add_schedule:function(){
+                    this.isAddSchedule = !this.isAddSchedule;
+                },
+                //修改代表是否正在搜索待办事项的flag
+                changeSearchFlag:function(){
+                    this.isSearch = !this.isSearch;
+                },
+                //保存清单
+                sub_list:function(){
+                    var arr = {
+                        listName:$('#newList').val(),
+                        schedule:[]
+                    }
+                    if(arr.listName!==""){
+                        this.lists.push(arr)
+                        this.isCreat = false
+                        data = {
+                            listName:$('#newList').val()
+                        }
+                        $.ajax({ 
+                            url: '/create_post',
+                            type: 'post',
+                            data:data,
+                        }); 
+                    }
+                },
+                //保存待办事项
+                sub_schedule:function(){
+                    if(this.createSchName!==""){
+                        var obj = {
+                            sch:this.createSchName,
+                            flag:false,
+                            priority:0
+                        }
+                        this.lists[this.kindOfList].schedule.push(obj)
+                        this.isAddSchedule = !this.isAddSchedule
+                        data = {
+                            sch:this.createSchName,
+                            kindOfList:this.kindOfList,
+                        }
+                        $.ajax({ 
+                            url: '/sub_schedule',
+                            type: 'post',
+                            data:data,
+                        });
+                        this.createSchName = ""
+                    }
+
+                },
+                reviseSch:function(){
+                    if($('#schName').val()!=""){
+                        this.lists[this.kindOfList].schedule[this.rightRightKindOfSch].sch = $('#schName').val()
+                        if($('#date').val()!==undefined){
+                            this.lists[this.kindOfList].schedule[this.rightRightKindOfSch].date = $('#date').val()
+                            console.log(this.lists[this.kindOfList].schedule[this.rightRightKindOfSch].sch+'增加截止日期成功')
+                        }
+                            
+                        var data={
+                            kindOfList:this.kindOfList,
+                            rightRightKindOfSch:this.rightRightKindOfSch,
+                            schName:$('#schName').val(),
+                            date:$('#date').val()
+                        }
+                        console.log(date)
+                        $.ajax({ 
+                                url: '/reviseSch',
+                                type: 'post',
+                                data:data,
+                            });
+                        $('#deadline').hide(1000) 
+                    }
+                    
+                    
+                },
+                cancel:function(){
+                    $('#deadline').hide()
+                },
+                //将后端数据复制到前端
+                copyLists:function(){
+                    this.username = '<%= username %>'
+                    var lists = JSON.parse('<%- JSON.stringify(lists) %>')
+                    this.lists.splice(0,this.lists.length)
+                    for(var j=0;j<lists.length;j++)
+                        this.lists.push(lists[j])             
+                },
+                //加载页面执行的函数
+                auto:function(){
+                    this.copyLists()
+                    this.startTime()
+                }
+            },
+            computed:{
+                resultLists: function(){
+                    var result = []
+                    for (var i=0;i<this.lists.length;i++){
+                        if(i!=2){
+                            for(var j=0;j<this.lists[i].schedule.length;j++)
+                            if(this.lists[i].schedule[j].sch.search(this.searchContent) != -1){
+                                var obj={
+                                    sch:this.lists[i].schedule[j].sch,
+                                    listName:this.lists[i].listName,
+                                    kindOfList:i
+                                }
+                                result.push(obj)
+                            }
+                        }
+                        
+                    }
+                    return result;
+                }
+            }
+        })
+    </script>
+    <script>
+        //对待办事项进行右击事件捕获
+       $(function() {
+            $("#scheMenu").mousedown(function(event) {
+                if (event.which===3) {
+                    var scheUl = document.getElementById('scheMenu');
+                    var liArr = scheUl.getElementsByTagName('li');
+                    for(var i=0;i<liArr.length;i++)                     
+                        if(document.defaultView.getComputedStyle(liArr[i], null).backgroundColor!=="rgba(255, 255, 255, 0.5)")
+                            vm.rightRightKindOfSch = i;  
+                    var options = {items:[
+                        {header: '待办事项功能'},
+                        {text:" 编辑",onclick:function(){
+                            $('#deadline').show()
+                            vm.isReviseSchName = vm.lists[vm.kindOfList].schedule[vm.rightRightKindOfSch].sch
+                        }},
+                        {text:" 标记为完成",onclick:function(){
+                            if(vm.isSearch || vm.isSort){
+                                alert("搜索/排序时不能标记完成")
+                            }else{
+                                if(vm.isDisplay === false){
+                                    alert("请先关闭隐藏功能再标记为已完成")
+                                }else{
+                                    var obj = vm.lists[vm.kindOfList].schedule[vm.rightRightKindOfSch]
+                                    vm.lists[vm.kindOfList].schedule[vm.rightRightKindOfSch].flag = true
+                                    vm.lists[2].schedule.push(obj)
+                                    console.log(vm.lists[vm.kindOfList].schedule[vm.rightRightKindOfSch].sch+'已完成')
+                                    var data = {
+                                        kindOfList:vm.kindOfList,
+                                        rightRightKindOfSch:vm.rightRightKindOfSch
+                                    }
+                                    $.ajax({ 
+                                        url: '/flag_sch',
+                                        type: 'post',
+                                        data:data,
+                                    }); 
+                                }
+                            }
+                            
+                        }},
+                        {text:" 标记为未完成",onclick:function(){
+                            if(vm.isSearch||vm.isSort){
+                                alert("搜索/排序时不能标记完成")
+                            }else{
+                                if(vm.isDisplay === false){
+                                    alert("请先关闭隐藏功能再标记为已完成")
+                                }else{
+                                    vm.lists[vm.kindOfList].schedule[vm.rightRightKindOfSch].flag = false;
+                                    for(var i=0;i<vm.lists[2].schedule.length;i++)
+                                        if(vm.lists[2].schedule[i].sch ==  vm.lists[vm.kindOfList].schedule[vm.rightRightKindOfSch].sch)
+                                            vm.lists[2].schedule.splice(i,1)
+                                    console.log(vm.lists[vm.kindOfList].schedule[vm.rightRightKindOfSch].sch+'已改为未完成')
+                                    var data = {
+                                        kindOfList:vm.kindOfList,
+                                        rightRightKindOfSch:vm.rightRightKindOfSch
+                                    }
+                                    $.ajax({ 
+                                        url: '/flag_sch',
+                                        type: 'post',
+                                        data:data,
+                                    }); 
+                                }
+                            }
+
+                        }},
+                        {text:" 显示/隐藏优先级",onclick:function(){
+                            vm.isDisplayPriority = !vm.isDisplayPriority
+                        }},
+                        {text:" 显示/隐藏已完成事项",onclick:function(){
+                            if(vm.isSearch|| vm.isSort){
+                                alert("搜索/排序时不能执行'显示/隐藏已完成事项'功能")
+                            }else{
+                                vm.isDisplay = !vm.isDisplay;
+                            }
+                        }},
+                        {text:"根据优先级排序",onclick:function(){
+                            vm.isSort = !vm.isSort
+                            var i,j;
+                            var obj = {
+                            }
+                          
+                                var orderSche = vm.lists[vm.kindOfList].schedule
+                       
+                                
+                            for(i=0;i<orderSche.length-1;i++){
+                                for(j=i+1;j<orderSche.length;j++){
+                                    if(orderSche[i].priority<orderSche[j].priority){
+                                        obj=orderSche[i];
+                                        orderSche[i] = orderSche[j]
+                                        orderSche[j] = obj
+                                    }
+                                }
+                            }
+                            console.log(vm.isSort)
+                            vm.orderSche = orderSche;
+                            for(var i=0;i<vm.orderSche.length;i++)
+                                console.log(vm.orderSche[i].sch+'优先级：'+vm.orderSche[i].priority)
+                        }},
+                        {text:" 标记为'0'优先级（优先级最低）",onclick:function(){
+                            if(vm.isSearch|| vm.isSort){
+                                alert("搜索/排序时不能执行该功能")
+                            }else{
+                                
+                                vm.lists[vm.kindOfList].schedule[vm.rightRightKindOfSch].priority = 0;
+                                var data = {
+                                    kindOfList:vm.kindOfList,
+                                    rightRightKindOfSch:vm.rightRightKindOfSch,
+                                    priority:0
+                                }
+                                $.ajax({ 
+                                    url: '/changePriority',
+                                    type: 'post',
+                                    data:data,
+                                });
+                            }
+                            
+                        }},
+                        {text:" 标记为'1'优先级（优先级中等）",onclick:function(){
+                            if(vm.isSearch|| vm.isSort){
+                                alert("搜索/排序时不能执行该功能")
+                            }else{
+                                
+                                    vm.lists[vm.kindOfList].schedule[vm.rightRightKindOfSch].priority = 1;
+                                
+                                var data = {
+                                    kindOfList:vm.kindOfList,
+                                    rightRightKindOfSch:vm.rightRightKindOfSch,
+                                    priority:1
+                                }
+                                $.ajax({ 
+                                    url: '/changePriority',
+                                    type: 'post',
+                                    data:data,
+                                });
+                            }
+                        }},
+                        {text:" 标记为'2'优先级（优先级最高）",onclick:function(){
+                            if(vm.isSearch|| vm.isSort){
+                                alert("搜索/排序时不能执行该功能")
+                            }else{
+                                
+                                    vm.lists[vm.kindOfList].schedule[vm.rightRightKindOfSch].priority = 2;
+                                
+                                var data = {
+                                    kindOfList:vm.kindOfList,
+                                    rightRightKindOfSch:vm.rightRightKindOfSch,
+                                    priority:2
+                                }
+                                $.ajax({ 
+                                    url: '/changePriority',
+                                    type: 'post',
+                                    data:data,
+                                });
+                            }
+                        }},
+                        {text: '删除所选待办事项', onclick: function() {
+                            if(vm.isSearch){
+                                alert("搜索时不能标记完成")
+                            }else{
+                              
+                                    vm.lists[vm.kindOfList].schedule.splice(vm.rightRightKindOfSch,1)
+                               
+                                var data = {
+                                    rightRightKindOfSch:vm.rightRightKindOfSch,
+                                    kindOfList:vm.kindOfList
+                                }
+                                $.ajax({ 
+                                    url: '/delete_schedule',
+                                    type: 'post',
+                                    data:data,
+                                }); 
+                            }
+                        }}
+                    ]}
+                    $('#scheMenu').contextify(options);
+                } 
+            })
+        })
+        //对清单进行右击事件捕获
+        $(function() {
+            $("#listMenu").mousedown(function(event) {
+                if (event.which===3) {
+                    var scheUl = document.getElementById('listMenu');
+                    var liArr = scheUl.getElementsByTagName('li');
+                    for(var i=0;i<liArr.length;i++){
+                        if(document.defaultView.getComputedStyle(liArr[i], null).backgroundColor!=="rgba(255, 255, 255, 0.5)")
+                            vm.rightRightKindOfList = i;
+                    }                  
+                    var options = {items:[
+                        {header: '清单功能'},
+                        {text: '删除该清单', onclick: function() {
+                            if(vm.rightRightKindOfList>=3){
+                                vm.lists.splice(vm.rightRightKindOfList,1)
+                                var data = {
+                                    rightRightKindOfList:vm.rightRightKindOfList
+                                }
+                                $.ajax({ 
+                                    url: '/delete_list',
+                                    type: 'post',
+                                    data:data,
+                                }); 
+                            }else{
+                                alert("该清单不能删除")
+                            }
+                            
+                        }}
+                    ]}
+                    $('#listMenu').contextify(options);
+                } 
+            })
+        })      
+        //对用户头像进行右击事件捕获
+        $(function() {
+            $(".head").mousedown(function(event) {
+                if (event.which===3) {              
+                    var options = {items:[
+                        {header: '用户设置'},
+                        {text: '注销', onclick: function() {
+                            window.location.href="logout"
+                        }},
+                        {text: '更换主题', onclick: function() {
+                            var kindOfSyle = (vm.kindOfSyle+1)%3;
+                            vm.kindOfSyle = vm.kindOfSyle+1;
+                            var bodyBackgrounImageArr=[
+                            "/images/bg1.jpg",
+                            "/images/bg4.jpg",
+                            "/images/bg8.jpg"];
+                            var bodyBackground = document.getElementById('index').style.backgroundImage = "url("+bodyBackgrounImageArr[kindOfSyle]+")";
+                        }}
+                    ]}
+                    $('.head').contextify(options);
+                } 
+            })
+        })  
+    </script>
+</body>
+</html>
